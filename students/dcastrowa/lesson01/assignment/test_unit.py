@@ -1,6 +1,7 @@
 from unittest import TestCase
 from inventory_management.inventory_class import Inventory
 from inventory_management.electric_appliances_class import ElectricAppliances
+from inventory_management.furniture_class import Furniture
 
 
 class InventoryTests(TestCase):
@@ -41,6 +42,26 @@ class ElectricAppliancesTests(TestCase):
                              stove.return_as_dictionary()[f'{key}'])
 
         self.assertEqual(dict, type(stove.return_as_dictionary()))
+
+
+class FurnitureTests(TestCase):
+
+    def test_return_as_dictionary(self):
+        couch = Furniture(3, 'comfy', 500, 600, 'leather', 'medium')
+
+        test_dictionary = {
+            'product_code': 3,
+            'description': 'comfy',
+            'market_price': 500,
+            'rental_price': 600,
+            'material': 'leather',
+            'size': 'medium'
+        }
+
+        for key, value in test_dictionary.items():
+            self.assertEqual(value, couch.return_as_dictionary()[f'{key}'])
+
+        self.assertEqual(dict, type(couch.return_as_dictionary()))
 
 
 if __name__ == '__main__':
