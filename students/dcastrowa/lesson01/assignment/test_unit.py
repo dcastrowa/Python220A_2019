@@ -3,6 +3,7 @@ from inventory_management.inventory_class import Inventory
 from inventory_management.electric_appliances_class import ElectricAppliances
 from inventory_management.furniture_class import Furniture
 from inventory_management.market_prices import get_latest_price
+from inventory_management.main import get_price
 
 
 class InventoryTests(TestCase):
@@ -50,7 +51,7 @@ class FurnitureTests(TestCase):
 
     def test_return_as_dictionary(self):
 
-        couch = Furniture(3, 'comfy', 500, 600, 'leather', 'medium')
+        couch = Furniture(3, 'comfy', 500, 600, 'leather', 'M')
 
         test_dictionary = {
             'product_code': 3,
@@ -58,7 +59,7 @@ class FurnitureTests(TestCase):
             'market_price': 500,
             'rental_price': 600,
             'material': 'leather',
-            'size': 'medium'
+            'size': 'M'
         }
 
         for key, value in test_dictionary.items():
@@ -74,6 +75,15 @@ class MarketPricesTests(TestCase):
         latest_price = get_latest_price()
 
         self.assertEqual(24, latest_price)
+
+
+class MainTests(TestCase):
+
+    def test_get_price(self):
+
+        price = get_price()
+
+        self.assertEqual('Get price', price)
 
 
 if __name__ == '__main__':
