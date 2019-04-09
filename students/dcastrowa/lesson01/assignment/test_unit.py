@@ -2,11 +2,13 @@ from unittest import TestCase
 from inventory_management.inventory_class import Inventory
 from inventory_management.electric_appliances_class import ElectricAppliances
 from inventory_management.furniture_class import Furniture
+from inventory_management.market_prices import get_latest_price
 
 
 class InventoryTests(TestCase):
 
     def test_return_as_dictionary(self):
+
         chair = Inventory(1, 'brown', 25, 30)
 
         test_dictionary = {
@@ -47,6 +49,7 @@ class ElectricAppliancesTests(TestCase):
 class FurnitureTests(TestCase):
 
     def test_return_as_dictionary(self):
+
         couch = Furniture(3, 'comfy', 500, 600, 'leather', 'medium')
 
         test_dictionary = {
@@ -62,6 +65,15 @@ class FurnitureTests(TestCase):
             self.assertEqual(value, couch.return_as_dictionary()[f'{key}'])
 
         self.assertEqual(dict, type(couch.return_as_dictionary()))
+
+
+class MarketPricesTests(TestCase):
+
+    def test_get_latest_price(self):
+
+        latest_price = get_latest_price()
+
+        self.assertEqual(24, latest_price)
 
 
 if __name__ == '__main__':
