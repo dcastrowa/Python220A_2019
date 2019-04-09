@@ -2,10 +2,10 @@
 Launches the user interface for the inventory management system
 '''
 import sys
-import market_prices
-import inventory_class
-from furniture_class import Furniture
-from electric_appliances_class import ElectricAppliances
+from inventory_management import market_prices
+from inventory_management import inventory_class
+from inventory_management import furniture_class
+from inventory_management import electric_appliances_class
 
 
 def main_menu(user_prompt=None):
@@ -30,14 +30,17 @@ def main_menu(user_prompt=None):
     return valid_prompts.get(user_prompt)
 
 
-def get_price():
+def get_price(item_code):
     '''
     print "Get price"
-    :return: print statement
+    :return: rental price of item
     '''
 
+    price = FULL_INVENTORY[item_code]['rental_price']
+
     print("Get price")
-    return "Get price"
+
+    return price
 
 
 def add_new_item():
@@ -45,7 +48,7 @@ def add_new_item():
     adds a new item to the inventory
     :return: print statement
     '''
-    full_inventory = {}
+
     item_code = input("Enter item code: ")
     item_description = input("Enter item description: ")
     item_rental_price = input("Enter item rental price: ")
@@ -57,23 +60,23 @@ def add_new_item():
     if is_furniture.lower() == "y":
         item_material = input("Enter item material: ")
         item_size = input("Enter item size (S,M,L,XL): ")
-        new_item = Furniture(item_code, item_description, item_price,
-                             item_rental_price, item_material, item_size)
+        new_item = furniture_class.Furniture(item_code, item_description, item_price,
+                                             item_rental_price, item_material, item_size)
     else:
         is_electric_appliance = input("Is this item an electric appliance? "
                                       "(Y/N): ")
         if is_electric_appliance.lower() == "y":
             item_brand = input("Enter item brand: ")
             item_voltage = input("Enter item voltage: ")
-            new_item = ElectricAppliances(item_code, item_description,
-                                          item_price, item_rental_price,
-                                          item_brand, item_voltage)
+            new_item = electric_appliances_class.ElectricAppliances(item_code, item_description,
+                                                                    item_price, item_rental_price,
+                                                                    item_brand, item_voltage)
         else:
             new_item = inventory_class.Inventory(item_code, item_description,
                                                  item_price, item_rental_price)
-    full_inventory[item_code] = new_item.return_as_dictionary()
+    FULL_INVENTORY[item_code] = new_item.return_as_dictionary()
     print("New inventory item added")
-    return "New inventory item added"
+    return FULL_INVENTORY[item_code]
 
 
 def item_info():
@@ -98,8 +101,10 @@ def exit_program():
     sys.exit()
 
 
+FULL_INVENTORY = {}
+
 if __name__ == '__main__':
-    FULL_INVENTORY = {}
+
     while True:
         print(FULL_INVENTORY)
         main_menu()()

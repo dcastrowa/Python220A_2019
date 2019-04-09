@@ -1,9 +1,11 @@
 from unittest import TestCase
+from unittest.mock import MagicMock, patch
+
 from inventory_management.inventory_class import Inventory
 from inventory_management.electric_appliances_class import ElectricAppliances
 from inventory_management.furniture_class import Furniture
-from inventory_management.market_prices import get_latest_price
-from inventory_management.main import get_price
+from inventory_management import market_prices
+from inventory_management import main
 
 
 class InventoryTests(TestCase):
@@ -72,18 +74,59 @@ class MarketPricesTests(TestCase):
 
     def test_get_latest_price(self):
 
-        latest_price = get_latest_price()
+        latest_price = market_prices.get_latest_price()
 
         self.assertEqual(24, latest_price)
 
 
 class MainTests(TestCase):
 
+    def test_add_item(self):
+
+        input_info = [2, 'chair', 20, 'n', 'n']
+        with patch('builtins.input', side_effect=input_info):
+            new_item = main.add_new_item()
+        self.assertEqual({
+                'product_code': 2,
+                'description': 'chair',
+                'market_price': 24,
+                'rental_price': 20,
+        }, new_item)
+
+    def test_add_furniture_item(self):
+
+        input_info = [3, 'couch', 250, 'y', 'leather', 'L']
+        with patch('builtins.input', side_effect=input_info):
+            new_furniture = main.add_new_item()
+        self.assertEqual({
+            'product_code': 3,
+            'description': 'couch',
+            'market_price': 24,
+            'rental_price': 250,
+            'material': 'leather',
+            'size': 'L'
+        }, new_furniture)
+
+    def test_add_electric_appliance_item(self):
+        input_info = [4, 'stove', 500, 'n', 'y', 'Steve Stoves', 55]
+        with patch('builtins.input', side_effect=input_info):
+            new_electric_appliance = main.add_new_item()
+        self.assertEqual({
+            'product_code': 4,
+            'description': 'stove',
+            'market_price': 24,
+            'rental_price': 500,
+            'brand': 'Steve Stoves',
+            'voltage': 55
+        }, new_electric_appliance)
+
     def test_get_price(self):
 
-        price = get_price()
-
-        self.assertEqual('Get price', price)
+        input_info = [2, 'stove', 1000, 'n', 'y', 'Steve Stoves', 220]
+        with patch('builtins.input', side_effect=input_info):
+            main.add_new_item()
+        price = main.get_price(2)
+        self.assertEqual(price, 1000)
 
 
 if __name__ == '__main__':
