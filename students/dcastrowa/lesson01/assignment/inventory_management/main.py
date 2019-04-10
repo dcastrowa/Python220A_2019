@@ -87,10 +87,15 @@ def item_info():
     item_code = input("Enter item code: ")
     if item_code in FULL_INVENTORY:
         print_dict = FULL_INVENTORY[item_code]
+        output = []
         for key, value in print_dict.items():
             print("{}:{}".format(key, value))
+        output.append(print_dict)
     else:
         print("Item not found in inventory")
+        output = "Item not found in inventory"
+
+    return output
 
 
 def exit_program():

@@ -120,6 +120,27 @@ class MainTests(TestCase):
             'voltage': 55
         }, new_electric_appliance)
 
+    def test_get_info(self):
+        input_info = [1, 'computer', 1200, 'n', 'y', 'Apple', 300]
+        with patch('builtins.input', side_effect=input_info):
+            main.add_new_item()
+        with patch('builtins.input', lambda value: 1):
+            item_dict = main.item_info()[0]
+            self.assertDictEqual(
+                {
+                    'product_code': 1,
+                    'description': 'computer',
+                    'market_price': 24,
+                    'rental_price': 1200,
+                    'brand': 'Apple',
+                    'voltage': 300
+                },
+                item_dict)
+        with patch('builtins.input', lambda value: 0):
+            not_found = main.item_info()
+            self.assertEqual(
+                "Item not found in inventory", not_found)
+
     def test_get_price(self):
 
         input_info = [2, 'stove', 1000, 'n', 'y', 'Steve Stoves', 220]
@@ -127,6 +148,21 @@ class MainTests(TestCase):
             main.add_new_item()
         price = main.get_price(2)
         self.assertEqual(price, 1000)
+
+    def test_main_menu_add(self):
+        with patch('builtins.input', lambda value: '1'):
+            sel = main.main_menu()
+            self.assertEqual(sel.__name__, 'add_new_item')
+
+    def test_main_menu_get(self):
+        with patch('builtins.input', lambda value: '2'):
+            sel = main.main_menu()
+            self.assertEqual(sel.__name__, 'item_info')
+
+    def test_main_menu_quit(self):
+        with patch('builtins.input', lambda value: 'q'):
+            main.main_menu()
+        self.assertRaises(SystemExit)
 
 
 if __name__ == '__main__':
