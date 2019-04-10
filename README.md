@@ -1,7 +1,4 @@
 # 220-Advanced
-## Your class name here
-Links for setting up git for this class:
+## Code written by: Daniel Castro
 
-- https://uwpce-pythoncert.github.io/PythonCertDevel220/modules/lesson00/git_setup.html
-- https://uwpce-pythoncert.github.io/PythonCertDevel220/modules/lesson00/git_workflow.html
-
+All work is related to the UW Python Certificate program.
