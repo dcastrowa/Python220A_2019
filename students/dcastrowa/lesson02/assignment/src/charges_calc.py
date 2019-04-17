@@ -1,19 +1,25 @@
 '''
-Returns total price paid for individual rentals 
+Returns total price paid for individual rentals
 '''
 import argparse
 import json
-import datetime
+from datetime import datetime
 import math
 import logging
 
 
 def init_logging(logging_level):
+    '''
+    inint logging for debug command options
+    :param logging_level:
+    :return: logger
+    '''
 
     # format of logging outputs and log file name
-    log_format = '%(asctime)s %(filename)s:%(lineno)-3d %(levelname)s %(message)s'
+    log_format = '%(asctime)s %(filename)s:%(lineno)-3d' \
+                 ' %(levelname)s %(message)s'
     formatter = logging.Formatter(log_format)
-    log_file = datetime.datetime.now().strftime('%Y-%m-%d') + '_charges_calc.log'
+    log_file = datetime.now().strftime('%Y-%m-%d') + '_charges_calc.log'
 
     # set up file
     file_handler = logging.FileHandler(log_file)
@@ -48,58 +54,89 @@ def init_logging(logging_level):
 
 
 def parse_cmd_arguments():
+    '''
+    argument parser for commands
+    :return: parse_args
+    '''
     parser = argparse.ArgumentParser(description='Process some integers.')
-    parser.add_argument('-i', '--input', help='input JSON file', required=True)
-    parser.add_argument('-o', '--output', help='ouput JSON file', required=True)
-    parser.add_argument('-d', '--debug', help='Enter debugging level: 0-no action 1-error, 2-warning, 3-debug',
-                        default=0, required=False)
+    parser.add_argument('-i', '--input',
+                        help='input JSON file',
+                        required=True)
+    parser.add_argument('-o', '--output',
+                        help='output JSON file',
+                        required=True)
+    parser.add_argument('-d', '--debug',
+                        choices=[0, 1, 2, 3],
+                        help='Debugging level: 1-error, 2-warning, 3-debug',
+                        default=0,
+                        required=False)
 
     return parser.parse_args()
 
 
 def load_rentals_file(filename):
+    '''
+    creates json data
+    :param filename:
+    :return: data (dictionary)
+    '''
     with open(filename) as file:
         try:
-            data = json.load(file)
+            json_data = json.load(file)
         except ValueError:
             exit(0)
-    return data
+    return json_data
 
 
-def calculate_additional_fields(data):
-    for value in data.values():
+def calculate_additional_fields(json_data):
+    '''
+    add total days, total price, and square root total price to data
+    :param json_data:
+    :return: json_data (dictionary)
+    '''
+    for value in json_data.values():
         try:
-            rental_start = datetime.datetime.strptime(value['rental_start'], '%m/%d/%y')
-            rental_end = datetime.datetime.strptime(value['rental_end'], '%m/%d/%y')
+            rental_start = datetime.strptime(value['rental_start'], f'%m/%d/%y')
+            rental_end = datetime.strptime(value['rental_end'], '%m/%d/%y')
             if rental_end < rental_start:
-                logging.error(f'The end date {value["rental_end"]} shouldn\'t be before'
-                              f' the start date {value["rental_start"]}.')
+                LOGGER.error(f'The end date {value["rental_end"]}'
+                             f' shouldn\'t be before'
+                             f' the start date {value["rental_start"]}.')
             elif rental_start == rental_end:
-                logging.warning(f'Returned the same day {value["rental_start"]}.')
+                LOGGER.warning(f'Returned the same day')
             else:
                 value['total_days'] = (rental_end - rental_start).days
-                value['total_price'] = value['total_days'] * value['price_per_day']
+                value['total_price'] = \
+                    value['total_days'] * value['price_per_day']
                 value['sqrt_total_price'] = math.sqrt(value['total_price'])
-                value['unit_cost'] = value['total_price'] / value['units_rented']
+                value['unit_cost'] = \
+                    value['total_price'] / value['units_rented']
         except ValueError as value_error:
             if value['rental_end'] == "":
-                logging.warning(
+                LOGGER.warning(
                     f"Item has no rental end date. Msg: {value_error}")
         except ZeroDivisionError as division_error:
             if value['units_rented'] == 0:
-                logging.error(f"No units rented, can't calculate unit_cost. Msg: {division_error}")
+                LOGGER.error(f"No units rented, can't calculate unit_cost. "
+                             f"Msg: {division_error}")
 
-    return data
+    return json_data
 
 
-def save_to_json(filename, data):
+def save_to_json(filename, json_data):
+    '''
+    saves a new json file of added data
+    :param filename:
+    :param json_data:
+    :return:
+    '''
     with open(filename, 'w') as file:
-        json.dump(data, file)
+        json.dump(json_data, file)
 
 
 if __name__ == "__main__":
-    args = parse_cmd_arguments()
-    logging = init_logging(args.debug)
-    data = load_rentals_file(args.input)
-    data = calculate_additional_fields(data)
-    save_to_json(args.output, data)
+    ARGS = parse_cmd_arguments()
+    LOGGER = init_logging(ARGS.debug)
+    DATA = load_rentals_file(ARGS.input)
+    DATA = calculate_additional_fields(DATA)
+    save_to_json(ARGS.output, DATA)

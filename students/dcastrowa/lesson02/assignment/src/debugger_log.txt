@@ -1,0 +1,97 @@
+> /Users/danielcastro/Documents/PythonCert/Python220/Python220A_2019/students/dcastrowa/lesson02/assignment/src/charges_calc.py(3)<module>()
+-> '''
+(Pdb) n
+> /Users/danielcastro/Documents/PythonCert/Python220/Python220A_2019/students/dcastrowa/lesson02/assignment/src/charges_calc.py(4)<module>()
+-> import argparse
+(Pdb) n
+> /Users/danielcastro/Documents/PythonCert/Python220/Python220A_2019/students/dcastrowa/lesson02/assignment/src/charges_calc.py(5)<module>()
+-> import json
+(Pdb) n
+> /Users/danielcastro/Documents/PythonCert/Python220/Python220A_2019/students/dcastrowa/lesson02/assignment/src/charges_calc.py(6)<module>()
+-> from datetime import datetime
+(Pdb) n
+> /Users/danielcastro/Documents/PythonCert/Python220/Python220A_2019/students/dcastrowa/lesson02/assignment/src/charges_calc.py(7)<module>()
+-> import math
+(Pdb) n
+> /Users/danielcastro/Documents/PythonCert/Python220/Python220A_2019/students/dcastrowa/lesson02/assignment/src/charges_calc.py(8)<module>()
+-> import logging
+(Pdb) n
+> /Users/danielcastro/Documents/PythonCert/Python220/Python220A_2019/students/dcastrowa/lesson02/assignment/src/charges_calc.py(11)<module>()
+-> def init_logging(logging_level):
+(Pdb) n
+> /Users/danielcastro/Documents/PythonCert/Python220/Python220A_2019/students/dcastrowa/lesson02/assignment/src/charges_calc.py(56)<module>()
+-> def parse_cmd_arguments():
+(Pdb) n
+> /Users/danielcastro/Documents/PythonCert/Python220/Python220A_2019/students/dcastrowa/lesson02/assignment/src/charges_calc.py(77)<module>()
+-> def load_rentals_file(filename):
+(Pdb) n
+> /Users/danielcastro/Documents/PythonCert/Python220/Python220A_2019/students/dcastrowa/lesson02/assignment/src/charges_calc.py(91)<module>()
+-> def calculate_additional_fields(json_data):
+(Pdb) n
+> /Users/danielcastro/Documents/PythonCert/Python220/Python220A_2019/students/dcastrowa/lesson02/assignment/src/charges_calc.py(126)<module>()
+-> def save_to_json(filename, json_data):
+(Pdb) n
+> /Users/danielcastro/Documents/PythonCert/Python220/Python220A_2019/students/dcastrowa/lesson02/assignment/src/charges_calc.py(137)<module>()
+-> if __name__ == "__main__":
+(Pdb) n
+> /Users/danielcastro/Documents/PythonCert/Python220/Python220A_2019/students/dcastrowa/lesson02/assignment/src/charges_calc.py(138)<module>()
+-> ARGS = parse_cmd_arguments()
+(Pdb) n
+> /Users/danielcastro/Documents/PythonCert/Python220/Python220A_2019/students/dcastrowa/lesson02/assignment/src/charges_calc.py(139)<module>()
+-> LOGGER = init_logging(ARGS.debug)
+(Pdb) n
+> /Users/danielcastro/Documents/PythonCert/Python220/Python220A_2019/students/dcastrowa/lesson02/assignment/src/charges_calc.py(140)<module>()
+-> DATA = load_rentals_file(ARGS.input)
+(Pdb) n
+> /Users/danielcastro/Documents/PythonCert/Python220/Python220A_2019/students/dcastrowa/lesson02/assignment/src/charges_calc.py(141)<module>()
+-> DATA = calculate_additional_fields(DATA)
+(Pdb) s
+--Call--
+> /Users/danielcastro/Documents/PythonCert/Python220/Python220A_2019/students/dcastrowa/lesson02/assignment/src/charges_calc.py(91)calculate_additional_fields()
+-> def calculate_additional_fields(json_data):
+(Pdb) ll
+ 91  ->	def calculate_additional_fields(json_data):
+ 92  	    '''
+ 93  	    add total days, total price, and square root total price to data
+ 94  	    :param json_data:
+ 95  	    :return: json_data (dictionary)
+ 96  	    '''
+ 97  	    for value in json_data.values():
+ 98  	        try:
+ 99  	            rental_start = datetime.strptime(value['rental_start'], f'%m/%d/%y')
+100  	            rental_end = datetime.strptime(value['rental_end'], '%m/%d/%y')
+101  	            if rental_end < rental_start:
+102  	                LOGGER.error(f'The end date {value["rental_end"]}'
+103  	                             f' shouldn\'t be before'
+104  	                             f' the start date {value["rental_start"]}.')
+105  	            elif rental_start == rental_end:
+106  	                LOGGER.warning(f'Returned the same day')
+107  	            else:
+108  	                value['total_days'] = (rental_end - rental_start).days
+109  	                value['total_price'] = \
+110  	                    value['total_days'] * value['price_per_day']
+111  	                value['sqrt_total_price'] = math.sqrt(value['total_price'])
+112  	                value['unit_cost'] = \
+113  	                    value['total_price'] / value['units_rented']
+114  	        except ValueError as value_error:
+115  	            if value['rental_end'] == "":
+116  	                LOGGER.warning(
+117  	                    f"Item has no rental end date. Msg: {value_error}")
+118  	        except ZeroDivisionError as division_error:
+119  	            if value['units_rented'] == 0:
+120  	                LOGGER.error(f"No units rented, can't calculate unit_cost. "
+121  	                             f"Msg: {division_error}")
+122
+123  	    return json_data
+(Pdb) n
+> /Users/danielcastro/Documents/PythonCert/Python220/Python220A_2019/students/dcastrowa/lesson02/assignment/src/charges_calc.py(97)calculate_additional_fields()
+-> for value in json_data.values():
+(Pdb) n
+> /Users/danielcastro/Documents/PythonCert/Python220/Python220A_2019/students/dcastrowa/lesson02/assignment/src/charges_calc.py(98)calculate_additional_fields()
+-> try:
+(Pdb) pp value
+{'price_per_day': 31,
+ 'product_code': 'PRD80',
+ 'rental_end': '3/22/17',
+ 'rental_start': '6/12/17',
+ 'units_rented': 8}
