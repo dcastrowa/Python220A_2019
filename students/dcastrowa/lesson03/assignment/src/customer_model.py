@@ -36,6 +36,6 @@ class Customer(BaseModel):
     home_address = CharField(max_length=80)
     phone_number = DecimalField(max_digits=10)
     email_address = CharField(max_length=80)
-    status = BooleanField
+    status = BooleanField()
     credit_limit = IntegerField(null=False)
 
