@@ -6,9 +6,11 @@ Operation class to create, remove, update, and delete customer data
 from customer_model import *
 import logging
 
+# set logger at info level
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# customer attributes
 CUSTOMER_ID = 0
 FIRST_NAME = 1
 LAST_NAME = 2
@@ -20,10 +22,15 @@ CREDIT_LIMIT = 7
 
 
 def add_customer(customer_id, first, last, addr, phone, email, status, limit):
+    """
+    adds a new customer to Customer table
+    :return: Customer table
+    """
+    # create() function to add customer data to the database
     new_customer = Customer.create(
         customer_id=customer_id,
-        first_name=last,
-        last_name=first,
+        first_name=first,
+        last_name=last,
         home_address=addr,
         phone_number=phone,
         email_address=email,
@@ -31,8 +38,9 @@ def add_customer(customer_id, first, last, addr, phone, email, status, limit):
         credit_limit=limit
     )
     new_customer.save()
-    logger.info('Successfully added database')
+    logger.info(f'Successfully added customer')
 
+    # iterate through customer data to log
     for customer in Customer:
         logger.info(f'id: {customer.customer_id}')
         logger.info(f'first: {customer.first_name}')
@@ -44,6 +52,68 @@ def add_customer(customer_id, first, last, addr, phone, email, status, limit):
         logger.info(f'limit: {customer.credit_limit}')
 
     return Customer
+
+
+def search_customer(customer_id):
+    """
+    search for customer by customer id
+    :return: (dictionary) customer data
+    """
+    with database.transaction():
+        query = (Customer
+                 .select(Customer)
+                 .where(Customer.customer_id == customer_id)
+                 )
+        logger.info('SELECT * FROM Customer WHERE customer_id = '
+                    f'{customer_id}')
+
+    logger.info('iterate through query to create dictionary')
+    results = {}
+    for item in query:
+        results['first_name'] = item.first_name
+        results['last_name'] = item.last_name
+        results['email'] = item.email_address
+        results['phone_number'] = item.phone_number
+
+    return results
+
+
+def delete_customer(customer_id):
+    """
+    delete customer by customer id
+    :return:
+    """
+    with database.transaction():
+        customer = Customer.get(Customer.customer_id == customer_id)
+
+        logger.info(f'Trying to delete {customer.first_name}')
+        customer.delete_instance()
+        logger.info(f'Deleted {customer.first_name}')
+
+
+def update_customer(customer_id, credit_limit):
+    """
+    update customer credit limit by customer id
+    :return:
+    """
+    with database.transaction():
+        customer_update = Customer.get(Customer.customer_id == customer_id)
+        logger.info(f'Current limit: {customer_update.credit_limit}')
+        customer_update.credit_limit = credit_limit
+        logger.info(f'New credit limit: {customer_update.credit_limit}')
+
+    return customer_update
+
+
+def list_active_customers():
+    with database.transaction():
+        query = (Customer
+                 .select(fn.COUNT(Customer.status).alias('count'))
+                 .where(Customer.status))
+
+    for item in query:
+        logger.info(f'Number of active customers {item.count}')
+        return item.count
 
 
 if __name__ == '__main__':
@@ -62,10 +132,12 @@ if __name__ == '__main__':
         ],
     ]
 
+    # create a table
     database.create_tables([Customer])
-    logging.info(f'Creating table {Customer.__name__}')
+    logger.info(f'Creating table {Customer.__name__}')
 
-    logging.info('Creating Customer records: iterate though the list of lists')
+    # iterate through list of customer data to add to Customer
+    logger.info('Creating Customer records: iterate though the list of lists')
     for customer in customers:
         try:
             with database.transaction():
@@ -78,7 +150,21 @@ if __name__ == '__main__':
                              customer[STATUS],
                              customer[CREDIT_LIMIT])
         except Exception as e:
-            logger.info(f'Error creating = ID:{customer[CUSTOMER_ID]}')
-            logger.info(e)
+            logger.warning(f'Error creating = ID: {customer[CUSTOMER_ID]}')
+            logger.warning(e)
 
+    # search for customer data
+    customer_info = search_customer(3)
+    if not bool(customer_info):
+        logger.warning(f'Customer not found')
+    else:
+        logger.info(customer_info)
+
+    delete_customer(2)
+    update_customer(1, 500)
+    list_active_customers()
+
+    # close database connection
     database.close()
+
+

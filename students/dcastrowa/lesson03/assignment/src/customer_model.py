@@ -17,24 +17,24 @@ logger.info('Connect to database')
 
 # Build BaseModel
 class BaseModel(Model):
-    '''
+    """
     Base model from peewee
-    '''
+    """
     class Meta:
         database = database
 
 
 # Customer class to hold all customer data
 class Customer(BaseModel):
-    '''
+    """
     This class is the Customer class that stores all data about
     our customers.
-    '''
+    """
     customer_id = IntegerField(primary_key=True)
     first_name = CharField(max_length=30)
     last_name = CharField(max_length=30)
     home_address = CharField(max_length=80)
-    phone_number = DecimalField(max_digits=10)
+    phone_number = IntegerField()
     email_address = CharField(max_length=80)
     status = BooleanField()
     credit_limit = IntegerField(null=False)
