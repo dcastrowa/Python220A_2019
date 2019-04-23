@@ -1,9 +1,9 @@
-'''
+"""
 basic_operations.py
 Operation class to create, remove, update, and delete customer data
-'''
+"""
 
-from customer_model import *
+from src.customer_model import *
 import logging
 
 # set logger at info level
@@ -26,30 +26,32 @@ def add_customer(customer_id, first, last, addr, phone, email, status, limit):
     adds a new customer to Customer table
     :return: Customer table
     """
-    # create() function to add customer data to the database
-    new_customer = Customer.create(
-        customer_id=customer_id,
-        first_name=first,
-        last_name=last,
-        home_address=addr,
-        phone_number=phone,
-        email_address=email,
-        status=status,
-        credit_limit=limit
-    )
-    new_customer.save()
-    logger.info(f'Successfully added customer')
-
-    # iterate through customer data to log
-    for customer in Customer:
-        logger.info(f'id: {customer.customer_id}')
-        logger.info(f'first: {customer.first_name}')
-        logger.info(f'last: {customer.last_name}')
-        logger.info(f'address: {customer.home_address}')
-        logger.info(f'phone: {customer.phone_number}')
-        logger.info(f'email: {customer.email_address}')
-        logger.info(f'status: {customer.status}')
-        logger.info(f'limit: {customer.credit_limit}')
+    try:
+        logger.info('Creating Customer record')
+        with database.transaction():
+            new_customer = Customer.create(
+                customer_id=customer_id,
+                first_name=first,
+                last_name=last,
+                home_address=addr,
+                phone_number=phone,
+                email_address=email,
+                status=status,
+                credit_limit=limit
+            )
+            new_customer.save()
+            logger.info(f'Successfully added customer: {new_customer}')
+            logger.info(f'id: {new_customer.customer_id}')
+            logger.info(f'first: {new_customer.first_name}')
+            logger.info(f'last: {new_customer.last_name}')
+            logger.info(f'address: {new_customer.home_address}')
+            logger.info(f'phone: {new_customer.phone_number}')
+            logger.info(f'email: {new_customer.email_address}')
+            logger.info(f'status: {new_customer.status}')
+            logger.info(f'limit: {new_customer.credit_limit}')
+    except Exception as e:
+        logger.warning(f'Error creating = ID: {customer_id}')
+        logger.warning(e)
 
     return Customer
 
@@ -57,15 +59,14 @@ def add_customer(customer_id, first, last, addr, phone, email, status, limit):
 def search_customer(customer_id):
     """
     search for customer by customer id
-    :return: (dictionary) customer data
+    :return: (dict) customer data
     """
     with database.transaction():
         query = (Customer
                  .select(Customer)
                  .where(Customer.customer_id == customer_id)
                  )
-        logger.info('SELECT * FROM Customer WHERE customer_id = '
-                    f'{customer_id}')
+        logger.info(query)
 
     logger.info('iterate through query to create dictionary')
     results = {}
@@ -75,6 +76,9 @@ def search_customer(customer_id):
         results['email'] = item.email_address
         results['phone_number'] = item.phone_number
 
+    if not bool(results):
+        logger.warning('Customer not found')
+
     return results
 
 
@@ -83,12 +87,18 @@ def delete_customer(customer_id):
     delete customer by customer id
     :return:
     """
-    with database.transaction():
-        customer = Customer.get(Customer.customer_id == customer_id)
+    try:
+        with database.transaction():
+            customer = Customer.get(Customer.customer_id == customer_id)
 
-        logger.info(f'Trying to delete {customer.first_name}')
-        customer.delete_instance()
-        logger.info(f'Deleted {customer.first_name}')
+            logger.info(f'Trying to delete {customer.first_name}')
+            customer.delete_instance()
+            logger.info(f'Deleted {customer.first_name}')
+    except Exception as e:
+        logger.warning(f'Customer ID: {customer_id} does not exist')
+        logger.warning(e)
+
+    return Customer
 
 
 def update_customer(customer_id, credit_limit):
@@ -102,18 +112,26 @@ def update_customer(customer_id, credit_limit):
         customer_update.credit_limit = credit_limit
         logger.info(f'New credit limit: {customer_update.credit_limit}')
 
-    return customer_update
+    return Customer
 
 
 def list_active_customers():
+    """
+    gets total number of active customers
+    :return: (int) # of active customers
+    """
     with database.transaction():
         query = (Customer
                  .select(fn.COUNT(Customer.status).alias('count'))
                  .where(Customer.status))
+        logger.info(query)
 
+    active_customers = []
     for item in query:
         logger.info(f'Number of active customers {item.count}')
-        return item.count
+        active_customers.append(item.count)
+
+    return active_customers[0]
 
 
 if __name__ == '__main__':
@@ -136,32 +154,27 @@ if __name__ == '__main__':
     database.create_tables([Customer])
     logger.info(f'Creating table {Customer.__name__}')
 
-    # iterate through list of customer data to add to Customer
-    logger.info('Creating Customer records: iterate though the list of lists')
+    # add customers from data to Customer table
     for customer in customers:
-        try:
-            with database.transaction():
-                add_customer(customer[CUSTOMER_ID],
-                             customer[FIRST_NAME],
-                             customer[LAST_NAME],
-                             customer[HOME_ADDRESS],
-                             customer[PHONE_NUMBER],
-                             customer[EMAIL_ADDRESS],
-                             customer[STATUS],
-                             customer[CREDIT_LIMIT])
-        except Exception as e:
-            logger.warning(f'Error creating = ID: {customer[CUSTOMER_ID]}')
-            logger.warning(e)
+        add_customer(customer[CUSTOMER_ID],
+                     customer[FIRST_NAME],
+                     customer[LAST_NAME],
+                     customer[HOME_ADDRESS],
+                     customer[PHONE_NUMBER],
+                     customer[EMAIL_ADDRESS],
+                     customer[STATUS],
+                     customer[CREDIT_LIMIT])
 
-    # search for customer data
-    customer_info = search_customer(3)
-    if not bool(customer_info):
-        logger.warning(f'Customer not found')
-    else:
-        logger.info(customer_info)
+    # search for customer id 3
+    search_customer(3)
 
+    # delete customer id 2
     delete_customer(2)
+
+    # update credit limit to 500 for customer id 1
     update_customer(1, 500)
+
+    # number of active users
     list_active_customers()
 
     # close database connection

@@ -30,7 +30,7 @@ class Customer(BaseModel):
     This class is the Customer class that stores all data about
     our customers.
     """
-    customer_id = IntegerField(primary_key=True)
+    customer_id = IntegerField(primary_key=True, null=False)
     first_name = CharField(max_length=30)
     last_name = CharField(max_length=30)
     home_address = CharField(max_length=80)

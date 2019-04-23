@@ -15,9 +15,9 @@ class BasicOperationsTests(TestCase):
         test_db.execute_sql('PRAGMA foreign_keys = ON;')
         test_db.create_tables([Customer])
 
-    def turnDown(self):
+    def tearDown(self):
         test_db.drop_tables([Customer])
-        database.close()
+        test_db.close()
 
     # test add customer
     def test_add_customer(self):
@@ -38,6 +38,8 @@ class BasicOperationsTests(TestCase):
         self.assertEqual(test_customer[7], Customer.credit_limit)
 
     def test_search_customer(self):
+        add_customer(1, 'Lady', 'Gaga', '453 Hollywood Blvd',
+                     555334290, 'badromance@gaga.com', True, 20000)
 
         customer_dict = search_customer(1)
 
@@ -49,6 +51,12 @@ class BasicOperationsTests(TestCase):
         }
 
         self.assertDictEqual(test_customer, customer_dict)
+
+    def test_list_active_customers(self):
+        add_customer(1, 'Lady', 'Gaga', '453 Hollywood Blvd',
+                     555334290, 'badromance@gaga.com', True, 20000)
+
+        self.assertEqual(1, list_active_customers())
 
 
 if __name__ == '__main__':
