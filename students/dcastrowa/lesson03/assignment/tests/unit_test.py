@@ -1,5 +1,5 @@
 from unittest import TestCase
-from src.basic_operations import *
+from src import basic_operations as bo
 from src.customer_model import *
 from peewee import *
 
@@ -22,7 +22,7 @@ class BasicOperationsTests(TestCase):
     # test add customer
     def test_add_customer(self):
 
-        add_customer(1, 'Lady', 'Gaga', '453 Hollywood Blvd',
+        bo.add_customer(1, 'Lady', 'Gaga', '453 Hollywood Blvd',
                      555334290, 'badromance@gaga.com', True, 20000)
 
         test_customer = [1, 'Lady', 'Gaga', '453 Hollywood Blvd',
@@ -38,10 +38,10 @@ class BasicOperationsTests(TestCase):
         self.assertEqual(test_customer[7], Customer.credit_limit)
 
     def test_search_customer(self):
-        add_customer(1, 'Lady', 'Gaga', '453 Hollywood Blvd',
-                     555334290, 'badromance@gaga.com', True, 20000)
+        bo.add_customer(1, 'Lady', 'Gaga', '453 Hollywood Blvd',
+                        555334290, 'badromance@gaga.com', True, 20000)
 
-        customer_dict = search_customer(1)
+        customer_dict = bo.search_customer(1)
 
         test_customer = {
             'first_name': 'Lady',
@@ -52,11 +52,25 @@ class BasicOperationsTests(TestCase):
 
         self.assertDictEqual(test_customer, customer_dict)
 
-    def test_list_active_customers(self):
-        add_customer(1, 'Lady', 'Gaga', '453 Hollywood Blvd',
-                     555334290, 'badromance@gaga.com', True, 20000)
+    def test_delete_customer(self):
+        bo.add_customer(1, 'Lady', 'Gaga', '453 Hollywood Blvd',
+                        555334290, 'badromance@gaga.com', True, 20000)
 
-        self.assertEqual(1, list_active_customers())
+        self.assertEqual(True, bo.delete_customer(1))
+        self.assertEqual(False, bo.delete_customer(5))
+
+    def test_update_customer(self):
+        bo.add_customer(1, 'Lady', 'Gaga', '453 Hollywood Blvd',
+                        555334290, 'badromance@gaga.com', True, 20000)
+
+        self.assertEqual(True, bo.update_customer(1, 255000))
+        self.assertEqual(False, bo.update_customer(7, 255000))
+
+    def test_list_active_customers(self):
+        bo.add_customer(1, 'Lady', 'Gaga', '453 Hollywood Blvd',
+                        555334290, 'badromance@gaga.com', True, 20000)
+
+        self.assertEqual(1, bo.list_active_customers())
 
 
 if __name__ == '__main__':

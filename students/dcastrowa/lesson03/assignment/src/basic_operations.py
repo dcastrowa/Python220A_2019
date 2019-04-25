@@ -3,8 +3,9 @@ basic_operations.py
 Operation class to create, remove, update, and delete customer data
 """
 
-from src.customer_model import *
+from customer_model import *
 import logging
+# import csv
 
 # set logger at info level
 logging.basicConfig(level=logging.INFO)
@@ -94,11 +95,14 @@ def delete_customer(customer_id):
             logger.info(f'Trying to delete {customer.first_name}')
             customer.delete_instance()
             logger.info(f'Deleted {customer.first_name}')
+
+            return True
+
     except Exception as e:
         logger.warning(f'Customer ID: {customer_id} does not exist')
         logger.warning(e)
 
-    return Customer
+        return False
 
 
 def update_customer(customer_id, credit_limit):
@@ -106,13 +110,20 @@ def update_customer(customer_id, credit_limit):
     update customer credit limit by customer id
     :return:
     """
-    with database.transaction():
-        customer_update = Customer.get(Customer.customer_id == customer_id)
-        logger.info(f'Current limit: {customer_update.credit_limit}')
-        customer_update.credit_limit = credit_limit
-        logger.info(f'New credit limit: {customer_update.credit_limit}')
+    try:
+        with DATABASE.transaction():
+            customer_update = Customer.get(Customer.customer_id == customer_id)
+            logger.info(f'Current limit: {customer_update.credit_limit}')
+            customer_update.credit_limit = credit_limit
+            logger.info(f'New credit limit: {customer_update.credit_limit}')
 
-    return Customer
+            return True
+
+    except Exception as e:
+        logger.warning(f'Customer ID: {customer_id} does not exist')
+        logger.warning(e)
+
+        return False
 
 
 def list_active_customers():
@@ -150,6 +161,15 @@ if __name__ == '__main__':
         ],
     ]
 
+# create customer list form csv file
+# customers = []
+# with open('/Users/danielcastro/Documents/PythonCert/Python220/'
+#           'Python220A_2019/students/template_student/lesson03/assignment/'
+#           'data/customer.csv', encoding='utf-8', errors='ignore') as people:
+#     customer_reader = csv.reader(people)
+#     for row in customer_reader:
+#         customers.append(row)
+
     # create a table
     database.create_tables([Customer])
     logger.info(f'Creating table {Customer.__name__}')
@@ -179,5 +199,6 @@ if __name__ == '__main__':
 
     # close database connection
     database.close()
+
 
 
