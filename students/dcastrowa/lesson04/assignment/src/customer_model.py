@@ -10,7 +10,7 @@ from peewee import CharField
 logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger(__name__)
 
-database = SqliteDatabase('lesson04.db')
+database = SqliteDatabase('../data/lesson04.db')
 database.connect()
 database.execute_sql('PRAGMA foreign_keys = ON;')
 LOGGER.info('Connect to database')

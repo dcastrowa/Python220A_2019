@@ -173,16 +173,13 @@ def get_data_from_csv(csv_file):
 
 if __name__ == '__main__':
 
-    CUSTOMER_DATA = get_data_from_csv('/Users/danielcastro/Documents/'
-                                      'PythonCert/Python220/Python220A_2019/'
-                                      'students/template_student/lesson04'
-                                      '/assignment/data/customer.csv')
+    CUSTOMER_DATA = get_data_from_csv('../data/customer.csv')
     # create a table
     database.create_tables([Customer])
     LOGGER.info('Creating table %s', Customer.__name__)
 
     # add customers from data to Customer table
-    for person in CUSTOMER_DATA[1]:
+    for person in CUSTOMER_DATA[1:]:
         add_customer(person[CUSTOMER_ID],
                      person[FIRST_NAME],
                      person[LAST_NAME],
