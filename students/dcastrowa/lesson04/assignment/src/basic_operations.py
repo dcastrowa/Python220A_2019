@@ -201,4 +201,3 @@ if __name__ == '__main__':
     # # number of active users
     list_active_customers()
 
-    database.close()
