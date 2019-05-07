@@ -38,12 +38,23 @@ class MongoDBConnection:
 MONGO = MongoDBConnection()
 
 
+def drop_collections(*collection_names):
+    """
+    drops a list of collections from database
+    """
+    with MONGO:
+        db = MONGO.connection.HP_Norton_DB
+
+        # delete collections
+        [db.drop_collection(collection) for collection in collection_names]
+
+
 def csv_to_list_of_dict(csv_file):
     """
     turns a csv file into a dictionary
     :return: list of dictionaries
     """
-    with open(csv_file) as product:
+    with open(csv_file, encoding='utf-8-sig') as product:
         reader = csv.reader(product)
         item_list = [row for row in reader]
         header = item_list[0]
@@ -123,14 +134,33 @@ def show_available_products():
         products = db['products']
 
         available_products = {}
-        for doc in products.find():
-            available_products[doc['\ufeffproduct_id']] = {
+        for doc in products.find({'quantity_available': {'$ne': '0'}}):
+            available_products[doc['product_id']] = {
                 'description': doc['description'],
                 'product_type': doc['product_type'],
                 'quantity_available': doc['quantity_available']
             }
 
     return available_products
+
+
+def show_rentals(product_id):
+    with MONGO:
+        db = MONGO.connection.HP_Norton_DB
+        rentals = db['rentals']
+        customers = db['customers']
+
+        rentals_available = {}
+        for prod in rentals.find({'product_id': product_id}):
+            for customer in customers.find({'user_id': prod['user_id']}):
+                rentals_available[prod['user_id']] = {
+                    'name': customer['name'],
+                    'address': customer['address'],
+                    'phone_number': customer['phone_number'],
+                    'email': customer['email']
+                }
+
+    return rentals_available
 
 
 def main():
@@ -142,7 +172,12 @@ def main():
     rental_f = '../data/rental.csv'
 
     import_data(product_f, customer_f, rental_f)
-    show_available_products()
+    print(show_available_products())
+    print('')
+    print(show_rentals('prd002'))
+
+    drop_collections('products', 'customers', 'rentals')
+    print(show_available_products())
 
 
 if __name__ == '__main__':

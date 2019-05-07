@@ -7,6 +7,7 @@ import pytest
 
 import database as l
 
+
 @pytest.fixture
 def _show_available_products():
     return {
@@ -22,6 +23,7 @@ def _show_available_products():
                     'quantity_available': '12'}
         }
 
+
 @pytest.fixture
 def _show_rentals():
     return {
@@ -31,10 +33,12 @@ def _show_rentals():
                     'phone_number': '839)825-0058', 'email': 'Mylene_Smitham@hannah.co.uk'}
         }
 
+
 def test_import_data():
     """ import """
-    data_dir = os.path.dirname(os.path.abspath(__file__))
-    added, errors = l.import_data(data_dir, "products.csv", "customers.csv", "rentals.csv")
+    added, errors = l.import_data("../data/products.csv",
+                                  "../data/customers.csv",
+                                  "../data/rentals.csv")
 
     for add in added:
         assert isinstance(add, int)
@@ -44,6 +48,7 @@ def test_import_data():
 
     assert added == (5, 11, 9)
     assert errors == (0, 0, 0)
+
 
 def test_show_available_products(_show_available_products):
     """ available products """
