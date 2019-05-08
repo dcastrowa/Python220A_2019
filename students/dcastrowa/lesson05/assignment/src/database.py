@@ -4,6 +4,7 @@ database.py
 """
 
 import csv
+import os
 from pymongo import MongoClient
 from pymongo import errors
 
@@ -48,13 +49,17 @@ def drop_collections(*collection_names):
         # delete collections
         [db.drop_collection(collection) for collection in collection_names]
 
+    return True
 
-def csv_to_list_of_dict(csv_file):
+
+def csv_to_list_of_dict(directory_name, csv_file):
     """
     turns a csv file into a dictionary
     :return: list of dictionaries
     """
-    with open(csv_file, encoding='utf-8-sig') as product:
+    cur_path = os.path.dirname(os.path.abspath(__file__))
+    csv_path = os.path.relpath(f'../{directory_name}/{csv_file}', cur_path)
+    with open(csv_path, encoding='utf-8-sig') as product:
         reader = csv.reader(product)
         item_list = [row for row in reader]
         header = item_list[0]
@@ -71,14 +76,15 @@ def csv_to_list_of_dict(csv_file):
     return all_items
 
 
-def import_data(product_file, customer_file, rental_file):
+def import_data(directory_name, product_file, customer_file, rental_file):
     """
     takes three csv files and imports the data into
     :return: 2 tuples with count of number of customers per input
     """
-    products_list = csv_to_list_of_dict(product_file)
-    customers_list = csv_to_list_of_dict(customer_file)
-    rentals_list = csv_to_list_of_dict(rental_file)
+    products_list = csv_to_list_of_dict(directory_name, product_file)
+    customers_list = csv_to_list_of_dict(directory_name, customer_file)
+    rentals_list = csv_to_list_of_dict(directory_name, rental_file)
+
     with MONGO:
         # connect to database or create new one if it already exists
         db = MONGO.connection.HP_Norton_DB
@@ -167,11 +173,7 @@ def main():
     """
     main function to integrate all functions
     """
-    product_f = '../data/product.csv'
-    customer_f = '../data/customers.csv'
-    rental_f = '../data/rental.csv'
-
-    import_data(product_f, customer_f, rental_f)
+    import_data('data', 'product.csv', 'customers.csv', 'rental.csv')
     print(show_available_products())
     print('')
     print(show_rentals('prd002'))
