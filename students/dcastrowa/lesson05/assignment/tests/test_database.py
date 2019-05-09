@@ -3,8 +3,8 @@ grade lesson 5
 """
 
 import pytest
-
-import src.database as l
+import os
+from src import database as l
 
 
 @pytest.fixture
@@ -65,11 +65,13 @@ def _show_rentals():
     }
 
 
+@pytest.mark.datafiles(os.path.dirname(os.getcwd()) + '/data')
 def test_import_data():
     """ import """
-    added, errors = l.import_data('product.csv',
-                                  l.main().customer_f,
-                                  l.main().rental_f)
+    added, errors = l.import_data('data',
+                                  'product.csv',
+                                  'customers.csv',
+                                  'rental.csv')
 
     for add in added:
         assert isinstance(add, int)

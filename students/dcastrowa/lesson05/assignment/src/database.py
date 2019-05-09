@@ -44,21 +44,25 @@ def drop_collections(*collection_names):
     drops a list of collections from database
     """
     with MONGO:
-        db = MONGO.connection.HP_Norton_DB
+        database = MONGO.connection.HP_Norton_DB
 
         # delete collections
-        [db.drop_collection(collection) for collection in collection_names]
+        for collection in collection_names:
+            database.drop_collection(collection)
 
     return True
-
 
 def csv_to_list_of_dict(directory_name, csv_file):
     """
     turns a csv file into a dictionary
     :return: list of dictionaries
     """
-    cur_path = os.path.dirname(os.path.abspath(__file__))
-    csv_path = os.path.relpath(f'../{directory_name}/{csv_file}', cur_path)
+    # cur_path = os.path.dirname(os.path.abspath(__file__))
+    # print(cur_path)
+    # csv_path = os.path.relpath(f'../{directory_name}/{csv_file}', cur_path)
+    # print(csv_path)
+    csv_path = os.path.dirname(os.getcwd()) + '/' + directory_name + '/' + \
+               csv_file
     with open(csv_path, encoding='utf-8-sig') as product:
         reader = csv.reader(product)
         item_list = [row for row in reader]
@@ -87,12 +91,12 @@ def import_data(directory_name, product_file, customer_file, rental_file):
 
     with MONGO:
         # connect to database or create new one if it already exists
-        db = MONGO.connection.HP_Norton_DB
+        database = MONGO.connection.HP_Norton_DB
 
         # insert data into the products collections
         product_errors = 0
         try:
-            products = db['products']
+            products = database['products']
             products.insert_many(products_list)
         except errors.CollectionInvalid:
             product_errors += 1
@@ -100,7 +104,7 @@ def import_data(directory_name, product_file, customer_file, rental_file):
         # insert data into the customer collection
         customer_errors = 0
         try:
-            customers = db['customers']
+            customers = database['customers']
             customers.insert_many(customers_list)
         except errors.CollectionInvalid:
             customer_errors += 1
@@ -108,7 +112,7 @@ def import_data(directory_name, product_file, customer_file, rental_file):
         # insert data into the rental collection
         rental_errors = 0
         try:
-            rentals = db['rentals']
+            rentals = database['rentals']
             rentals.insert_many(rentals_list)
         except errors.CollectionInvalid:
             rental_errors += 1
@@ -136,8 +140,8 @@ def show_available_products():
     return: dictionary
     """
     with MONGO:
-        db = MONGO.connection.HP_Norton_DB
-        products = db['products']
+        database = MONGO.connection.HP_Norton_DB
+        products = database['products']
 
         available_products = {}
         for doc in products.find({'quantity_available': {'$ne': '0'}}):
@@ -151,10 +155,13 @@ def show_available_products():
 
 
 def show_rentals(product_id):
+    """
+    shows all the customers info based on product id
+    """
     with MONGO:
-        db = MONGO.connection.HP_Norton_DB
-        rentals = db['rentals']
-        customers = db['customers']
+        database = MONGO.connection.HP_Norton_DB
+        rentals = database['rentals']
+        customers = database['customers']
 
         rentals_available = {}
         for prod in rentals.find({'product_id': product_id}):

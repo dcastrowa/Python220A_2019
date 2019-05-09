@@ -1,0 +1,9 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.7.2, pytest-4.0.0, py-1.7.0, pluggy-0.8.0
+rootdir: /Users/danielcastro/Documents/PythonCert/Python220/Python220A_2019/students/dcastrowa/lesson05/assignment, inifile:
+plugins: pylint-0.12.3, mock-1.10.0, cov-2.6.1
+collected 4 items
+
+tests/test_database.py ....                                              [100%]
+
+=========================== 4 passed in 0.24 seconds ===========================
