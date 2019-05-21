@@ -6,60 +6,69 @@ author: dcastrowa
 
 import datetime
 import csv
+from collections import defaultdict
 
 
-def analyze(filename):
-    start = datetime.datetime.now()
-    with open(filename) as csvfile:
+def get_data(csv_filename):
+    """
+    row reader into a generator
+    """
+    with open(csv_filename) as csvfile:
         reader = csv.reader(csvfile, delimiter=',', quotechar='"')
-        new_ones = []
         for row in reader:
-            lrow = list(row)
-            if lrow[5] > '00/00/2012':
-                new_ones.append((lrow[5], lrow[0]))
+            yield row
 
-        year_count = {
-            "2013": 0,
-            "2014": 0,
-            "2015": 0,
-            "2016": 0,
-            "2017": 0,
-            "2018": 0
-        }
 
-        for new in new_ones:
-            if new[0][6:] == '2013':
-                year_count["2013"] += 1
-            if new[0][6:] == '2014':
-                year_count["2014"] += 1
-            if new[0][6:] == '2015':
-                year_count["2015"] += 1
-            if new[0][6:] == '2016':
-                year_count["2016"] += 1
-            if new[0][6:] == '2017':
-                year_count["2017"] += 1
-            if new[0][6:] == '2018':
-                year_count["2017"] += 1
+def analyze(file_name):
+    """
+    analyze the data created
+    """
+    start = datetime.datetime.now()
+    gen_a = get_data(file_name)
 
-        print(year_count)
+    # turned the for loop creating a list into a generator
+    new_ones = ((list(row)[5], list(row)[0]) for row in gen_a
+                if list(row)[5] > '00/00/2012')
 
-    with open(filename) as csvfile:
-        reader = csv.reader(csvfile, delimiter=',', quotechar='"')
+    # used default dict to create a dictionary
+    year_count = defaultdict(int)
+    for new in new_ones:
+        if new[0][6:] == '2013':
+            year_count["2013"] += 1
+        elif new[0][6:] == '2014':
+            year_count["2014"] += 1
+        elif new[0][6:] == '2015':
+            year_count["2015"] += 1
+        elif new[0][6:] == '2016':
+            year_count["2016"] += 1
+        elif new[0][6:] == '2017':
+            year_count["2017"] += 1
+        elif new[0][6:] == '2018':
+            year_count["2018"] += 1
 
-        found = 0
+    print(year_count)
 
-        for line in reader:
-            lrow = list(line)
-            if "ao" in line[6]:
-                found += 1
+    found = 0
+    gen_b = get_data(file_name)
 
-        print(f"'ao' was found {found} times")
-        end = datetime.datetime.now()
+    # created a second generator for this second loop
+    for line in gen_b:
+        if "ao" in line[6]:
+            found += 1
 
-    return (start, end, year_count, found)
+    print(f"'ea' was found {found} times")
+    end = datetime.datetime.now()
+
+    return start, end, year_count, found
+
 
 def main():
-    filename = "/Users/danielcastro/Documents/PythonCert/Python220/Python220A_2019/students/dcastrowa/lesson06/assignment/data/exercise.csv"
+    """
+    main function to run all functions
+    """
+    filename = "/Users/danielcastro/Documents/PythonCert/Python220" \
+               "/Python220A_2019/students/dcastrowa/lesson06/assignment" \
+               "/data/exercise.csv"
     analyze(filename)
 
 

@@ -12,6 +12,9 @@ faker = Faker()
 
 
 def generate_data(csv_file):
+    """
+    creates more data in the csv file
+    """
     with open(csv_file, 'w') as file:
         writer = csv.DictWriter(file,
                                 delimiter=',',
@@ -20,10 +23,13 @@ def generate_data(csv_file):
                                     'seq',
                                     'guid',
                                     'seq',
+                                    'seq',
                                     'ccnumber',
                                     'date',
                                     'sentence'
                                 ])
+
+        writer.writeheader()
         for new_lines in range(1000000):
             writer.writerow(dict(
                 seq=new_lines + 1,
