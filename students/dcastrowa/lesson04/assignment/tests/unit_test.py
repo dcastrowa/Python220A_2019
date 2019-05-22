@@ -1,5 +1,5 @@
 from unittest import TestCase
-from src import basic_operations as bo
+import src.basic_operations as bo
 from src.customer_model import *
 from peewee import *
 
