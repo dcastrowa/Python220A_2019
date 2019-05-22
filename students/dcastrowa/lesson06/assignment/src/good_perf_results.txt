@@ -1,0 +1,5 @@
+  2000004    3.609    0.000    3.660    0.000 good_perf.py:12(get_data)
+        1    1.021    1.021    5.385    5.385 good_perf.py:22(analyze)
+  1000002    0.704    0.000    2.559    0.000 good_perf.py:30(<genexpr>)
+        1    0.000    0.000    5.385    5.385 good_perf.py:65(main)
+        1    0.000    0.000    5.390    5.390 good_perf.py:5(<module>)

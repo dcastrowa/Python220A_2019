@@ -1,0 +1,3 @@
+        1    5.144    5.144    5.259    5.259 poor_perf.py:9(analyze)
+        1    0.074    0.074    5.333    5.333 poor_perf.py:59(main)
+        1    0.000    0.000    5.337    5.337 poor_perf.py:4(<module>)
