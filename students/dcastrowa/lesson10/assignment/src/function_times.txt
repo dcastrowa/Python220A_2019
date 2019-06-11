@@ -1,0 +1,8 @@
+2019-06-10 18:23:44.442956: csv_to_list_of_dict ran in 0.018391847610473633 seconds, processing 2 records
+2019-06-10 18:23:44.561274: csv_to_list_of_dict ran in 0.11780190467834473 seconds, processing 2 records
+2019-06-10 18:23:44.609548: csv_to_list_of_dict ran in 0.0471339225769043 seconds, processing 2 records
+2019-06-10 18:23:45.195521: import_data ran in 0.7709760665893555 seconds, processing 4 records
+2019-06-10 18:23:45.245016: show_available_products ran in 0.04926586151123047 seconds, processing 0 records
+2019-06-10 18:23:45.354515: show_rentals ran in 0.014160871505737305 seconds, processing 1 records
+2019-06-10 18:23:45.409716: drop_collections ran in 0.05477118492126465 seconds, processing 3 records
+2019-06-10 18:23:45.413053: show_available_products ran in 0.002991914749145508 seconds, processing 0 records
